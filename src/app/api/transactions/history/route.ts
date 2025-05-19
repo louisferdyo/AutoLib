@@ -4,12 +4,17 @@ import { createServerSupabaseClient } from '../../../../../lib/supabaseServer'
 export async function GET(req: Request): Promise<NextResponse> {
   const supabase = createServerSupabaseClient()
   const url = new URL(req.url);
-  const userId = url.searchParams.get('user_id');
+  // Get authenticated user
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-
-  if (!userId) {
-    return NextResponse.json({ error: 'Missing user_id' }, { status: 400 })
+  if (userError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  const userId = user.id;
 
   try {
     const { data, error } = await supabase

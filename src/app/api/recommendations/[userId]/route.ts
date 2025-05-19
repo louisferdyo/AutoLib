@@ -3,13 +3,22 @@ import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  // { params }: { params: { userId: string } }
 ) {
   try {
     const supabase = createServerSupabaseClient();
-    const { userId } = params;
-    
-    // Ambil query param 'limit' dari URL
+
+    // Ambil user yang sudah login
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userId = user.id;
     const limit = parseInt(request.nextUrl.searchParams.get('limit') || '5');
 
     // Ambil riwayat aktivitas user
