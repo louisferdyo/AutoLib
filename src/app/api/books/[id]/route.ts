@@ -1,21 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
+// src/app/api/books/[id]/route.ts
 import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+interface RouteParams {
+  params: {
+    id: string;
+  };
+}
+
+export async function GET(request: Request, { params }: RouteParams) {
   try {
     const supabase = createServerSupabaseClient();
     const bookId = params.id;
     
-    if (!bookId) {
-      return NextResponse.json(
-        { error: 'Book ID is required' },
-        { status: 400 }
-      );
-    }
-
     // Get book details
     const { data: book, error } = await supabase
       .from('books')
@@ -24,26 +20,15 @@ export async function GET(
       .single();
       
     if (error) {
-      console.error('Error fetching book details:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch book details' },
-        { status: 500 }
-      );
+      return Response.json({ error: error.message }, { status: 500 });
     }
 
     if (!book) {
-      return NextResponse.json(
-        { error: 'Book not found' },
-        { status: 404 }
-      );
+      return Response.json({ error: 'Book not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ book }, { status: 200 });
+    return Response.json({ book }, { status: 200 });
   } catch (err) {
-    console.error('Unexpected error:', err);
-    return NextResponse.json(
-      { error: 'An unexpected error occurred' },
-      { status: 500 }
-    );
+    return Response.json({ error: 'An unexpected error occurred' }, { status: 500 });
   }
 }
