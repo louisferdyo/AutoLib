@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "../../../../../lib/supabaseServer";
 import { processBookReturn } from "../../../../..//lib/services/transactionService";
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function POST(request: Request): Promise<NextResponse> {
   try {
     const supabase = createServerSupabaseClient();
 

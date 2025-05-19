@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '../../../../../../lib/supabaseServer';
 
 export async function POST(
-  req: NextRequest,
+  req: Request,
   { params }: { params: { transaction_id: string } }
 ) {
   try {

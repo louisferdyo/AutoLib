@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
+export async function POST(req: Request): Promise<NextResponse> {
   // Initialize Supabase client with cookies for auth
   const supabase = createServerSupabaseClient();
 

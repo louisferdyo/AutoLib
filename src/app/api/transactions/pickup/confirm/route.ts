@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 import { confirmBookPickup } from '../../../../../../lib/services/transactionService'
 import { createServerSupabaseClient } from '../../../../../../lib/supabaseServer';
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const supabase = createServerSupabaseClient();
     // 1. Validasi body

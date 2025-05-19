@@ -2,11 +2,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '../../../../../lib/supabaseServer'
 
-export async function GET(req: NextRequest): Promise<NextResponse> {
+export async function GET(req: Request): Promise<NextResponse> {
   // Supabase client yang sudah benar baca cookie auth
   const supabase = createServerSupabaseClient()
 
-  const userId = req.nextUrl.searchParams.get('user_id')
+  const url = new URL(req.url);
+  const userId = url.searchParams.get('user_id');
+
   if (!userId) {
     return NextResponse.json({ error: 'Missing user_id' }, { status: 400 })
   }

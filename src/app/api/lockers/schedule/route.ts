@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 import { getUserActiveLockerSchedules } from '../../../../..//lib/services/lockerService'
 import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
     const supabase = createServerSupabaseClient();
     // 1. Ambil session user

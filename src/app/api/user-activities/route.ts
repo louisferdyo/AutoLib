@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '../../../../lib/supabaseServer';
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
     const authHeader = req.headers.get('authorization')
     const token = authHeader?.split(' ')[1]
@@ -19,7 +19,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Ambil parameter query
-    const searchParams = req.nextUrl.searchParams
+    const url = new URL(req.url);
+    const searchParams = url.searchParams;
+
     const limit = parseInt(searchParams.get('limit') || '10')
     const page = parseInt(searchParams.get('page') || '1')
     const offset = (page - 1) * limit

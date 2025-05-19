@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import {createServerSupabaseClient} from '../../../../lib/supabaseServer';
 
 // Get all books with optional pagination and filtering
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
    const supabase = createServerSupabaseClient()
   try {
-    const searchParams = request.nextUrl.searchParams;
+    const url = new URL(request.url);
+    const searchParams = url.searchParams;
+    // const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('query') || '';
     const category = searchParams.get('category') || null;
     const page = parseInt(searchParams.get('page') || '1');
