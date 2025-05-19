@@ -5,9 +5,10 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const supabase = createServerSupabaseClient();
+  
   
   try {
+    const supabase = createServerSupabaseClient();
     const bookId = params.id;
     
     if (!bookId) {
