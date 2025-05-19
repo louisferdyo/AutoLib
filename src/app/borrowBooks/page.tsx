@@ -1,17 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+// import { useSearchParams } from 'next/navigation';
 import {createClient} from '../../../lib/supabase';
-
+import { useBorrowStore } from '../../stores/useBorrowState';
 interface Locker {
   id: string;
   locker_name: string;
 }
 
 export default function BorrowBooksPage() {
-  const searchParams = useSearchParams();
-  const bookId = searchParams.get('id')!;
+  const bookId = useBorrowStore((state) => state.bookId);
 
   const [userId, setUserId] = useState<string | null>(null);
   const [scheduledPickup, setScheduledPickup] = useState('');
@@ -78,10 +77,10 @@ export default function BorrowBooksPage() {
 
   useEffect(() => {
     if (!bookId) return;
-
+    const validBookId = bookId as string;
     async function fetchQuantity() {
       try {
-        const res = await fetch(`/api/books/quantity?id=${encodeURIComponent(bookId)}`);
+        const res = await fetch(`/api/books/quantity?id=${encodeURIComponent(validBookId)}`);
         const json = await res.json();
         if (res.ok) {
           setAvailableQuantity(json.available_quantity);

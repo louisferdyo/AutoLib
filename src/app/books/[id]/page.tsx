@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useBorrowStore } from '../../../stores/useBorrowState';
 
 interface Book {
   id: string;
@@ -19,6 +20,8 @@ interface Book {
 
 export default function BookDetailPage() {
   const router = useRouter();
+  const setBookId = useBorrowStore((state) => state.setBookId);
+   
   const params = useParams();
   const id = params?.id as string;
 
@@ -44,37 +47,11 @@ export default function BookDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleBorrow = async () => {
+  
+  const handleBorrow = () => {
     if (!book) return;
-    setBorrowing(true);
-    setBorrowError(null);
-    // set jadwal: sekarang dan +7 hari
-    const now = new Date();
-    const later = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-    try {
-      const res = await fetch('/api/transactions/borrow', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bookId: book.id,
-          // backend akan ambil user_id dari session
-          scheduledPickup: now.toISOString(),
-          scheduledReturn: later.toISOString(),
-        }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json.error || 'Failed to borrow book');
-      }
-      setBorrowSuccess(true);
-      // redirect ke halaman history, misal:
-      setTimeout(() => router.push('/transactions/history'), 1500);
-    } catch (e: any) {
-      setBorrowError(e.message);
-    } finally {
-      setBorrowing(false);
-    }
+    setBookId(book.id);
+    router.push('/borrowBooks');
   };
 
   if (loading) return (
@@ -159,16 +136,17 @@ export default function BookDetailPage() {
 
           {/* Tombol Pinjam */}
           <div className="mt-6">
-            <Link
-              href={`/borrowBooks?id=${book.id}`}
+            <button
+              onClick={handleBorrow}
+              disabled={book.available_quantity === 0 || borrowing}
               className={`inline-block px-6 py-3 rounded-lg text-white font-semibold ${
                 book.available_quantity > 0
                   ? 'bg-blue-600 hover:bg-blue-700'
                   : 'bg-gray-400 pointer-events-none'
               }`}
             >
-              Pinjam Buku
-            </Link>
+              {borrowing ? 'Memproses...' : 'Pinjam Buku'}
+            </button>
         </div>
 
         </div>
