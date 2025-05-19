@@ -2,22 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  
-  
   try {
     const supabase = createServerSupabaseClient();
     const bookId = params.id;
     
     if (!bookId) {
-      return new Response(
-        JSON.stringify({ error: 'Book ID is required' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
+      return NextResponse.json(
+        { error: 'Book ID is required' },
+        { status: 400 }
       );
     }
 
@@ -30,37 +25,25 @@ export async function GET(
       
     if (error) {
       console.error('Error fetching book details:', error);
-      return new Response(
-        JSON.stringify({ error: 'Failed to fetch book details' }),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        }
+      return NextResponse.json(
+        { error: 'Failed to fetch book details' },
+        { status: 500 }
       );
     }
 
     if (!book) {
-      return new Response(
-        JSON.stringify({ error: 'Book not found' }),
-        {
-          status: 404,
-          headers: { 'Content-Type': 'application/json' },
-        }
+      return NextResponse.json(
+        { error: 'Book not found' },
+        { status: 404 }
       );
     }
 
-    return new Response(JSON.stringify({ book }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json({ book }, { status: 200 });
   } catch (err) {
     console.error('Unexpected error:', err);
-    return new Response(
-      JSON.stringify({ error: 'An unexpected error occurred' }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
+    return NextResponse.json(
+      { error: 'An unexpected error occurred' },
+      { status: 500 }
     );
   }
 }
