@@ -12,12 +12,15 @@ export async function GET(
     const bookId = params.id;
     
     if (!bookId) {
-      return NextResponse.json(
-        { error: 'Book ID is required' },
-        { status: 400 }
+      return new Response(
+        JSON.stringify({ error: 'Book ID is required' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
       );
     }
-    
+
     // Get book details
     const { data: book, error } = await supabase
       .from('books')
@@ -27,25 +30,37 @@ export async function GET(
       
     if (error) {
       console.error('Error fetching book details:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch book details' },
-        { status: 500 }
+      return new Response(
+        JSON.stringify({ error: 'Failed to fetch book details' }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
       );
     }
-    
+
     if (!book) {
-      return NextResponse.json(
-        { error: 'Book not found' },
-        { status: 404 }
+      return new Response(
+        JSON.stringify({ error: 'Book not found' }),
+        {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        }
       );
     }
-    
-    return NextResponse.json({ book });
-  } catch (error) {
-    console.error('Unexpected error:', error);
-    return NextResponse.json(
-      { error: 'An unexpected error occurred' },
-      { status: 500 }
+
+    return new Response(JSON.stringify({ book }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    return new Response(
+      JSON.stringify({ error: 'An unexpected error occurred' }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
     );
   }
 }
