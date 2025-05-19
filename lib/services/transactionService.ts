@@ -1,5 +1,5 @@
 // lib/services/transactionService.ts
-import supabase from '../supabase';
+import {createClient} from '../supabase';
 import { updateBookAvailability, checkBookAvailability } from './bookService';
 import { findAvailableLocker, scheduleLocker } from './lockerService';
 
@@ -64,6 +64,7 @@ export async function createBorrowTransaction(
   returnTime: string
 ): Promise<CreateBorrowTransactionResult> {
   try {
+    const supabase = createClient()
     const { isAvailable } = await checkBookAvailability(bookId);
     if (!isAvailable) {
       throw new Error('Book is not available for borrowing');
@@ -136,6 +137,7 @@ export async function processBookReturn(
   userId: string
 ): Promise<ProcessReturnResult> {
   try {
+    const supabase = createClient()
     const { data: transaction, error: txError } = await supabase
       .from('transactions')
       .select('id, book_id, status, locker_id')
@@ -192,6 +194,7 @@ export async function confirmBookPickup(
   transactionId: string
 ): Promise<ConfirmPickupResult> {
   try {
+    const supabase = createClient()
     const now = new Date().toISOString();
 
     const { data, error } = await supabase
@@ -221,6 +224,7 @@ export async function getUserActiveTransactions(
   userId: string
 ): Promise<TransactionWithSingleRelations[]> {
   try {
+    const supabase = createClient()
     const { data, error } = await supabase
       .from('transactions')
       .select(`
@@ -272,6 +276,7 @@ export async function getUserTransactionHistory(
   page = 1
 ): Promise<UserTransactionHistoryResult> {
   try {
+    const supabase = createClient()
     const offset = (page - 1) * limit;
 
     const { data, error, count } = await supabase

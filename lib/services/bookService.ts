@@ -1,5 +1,5 @@
 // lib/services/bookService.ts
-import  supabase  from '../supabase';
+import  {createClient}  from '../supabase';
 
 interface Book {
   id: string;
@@ -33,6 +33,7 @@ export async function updateBookAvailability(
   incrementBy = -1
 ): Promise<UpdateAvailabilityResult> {
   try {
+    const supabase = createClient()
     const { data: book, error: fetchError } = await supabase
       .from('books')
       .select('available_quantity, total_quantity')
@@ -75,6 +76,7 @@ export async function updateBookAvailability(
  */
 export async function checkBookAvailability(bookId: string): Promise<CheckAvailabilityResult> {
   try {
+    const supabase = createClient()
     const { data, error } = await supabase
       .from('books')
       .select('id, title, author, available_quantity')

@@ -1,9 +1,9 @@
 // app/api/auth/register/route.ts
 import { NextResponse } from 'next/server';
-import supabase from '../../../../../lib/supabase';
+import {createServerSupabaseClient} from '../../../../../lib/supabaseServer' 
 
 export async function POST(request: Request) {
-//   const supabase = createSupabaseServerClient()
+  const supabase = createServerSupabaseClient()
   try {
     const body = await request.json();
     const { email, password, fullName } = body;

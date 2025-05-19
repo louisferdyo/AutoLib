@@ -1,5 +1,5 @@
 // lib/services/lockerService.ts
-import  supabase from '../supabase';
+import  {createClient} from '../supabase';
 import { assignLockerAccess, revokeLockerAccess } from '../mqtt';
 
 type Locker = { id: string };
@@ -21,6 +21,7 @@ export async function findAvailableLocker(
   startTime: Date,
   endTime: Date
 ): Promise<string | null> {
+  const supabase = createClient()
   // 1. Ambil semua locker_id yang sedang dipakai di waktu bentrok
   const { data: blocked, error: blockedError } = await supabase
     .from('locker_schedules')
@@ -65,6 +66,7 @@ export async function scheduleLocker(
   startTime: Date,
   endTime: Date
 ): Promise<LockerSchedule> {
+  const supabase = createClient()
   const { data, error } = await supabase
     .from('locker_schedules')
     .insert({
@@ -93,6 +95,7 @@ export async function scheduleLocker(
 export async function cancelLockerSchedule(
   scheduleId: string
 ): Promise<boolean> {
+  const supabase = createClient()
   const { data: scheduleData, error: fetchError } = await supabase
     .from('locker_schedules')
     .select('locker_id, user_id, transaction_id')
@@ -128,6 +131,7 @@ export async function cancelLockerSchedule(
 export async function getUserActiveLockerSchedules(
   userId: string
 ) {
+  const supabase = createClient()
   const now = new Date().toISOString();
   const { data, error } = await supabase
     .from('locker_schedules')
