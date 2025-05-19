@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '../../../../../../lib/supabaseServer';
+import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
 
 export async function POST(
   req: Request,
-  { params }: { params: { transaction_id: string } }
+  // { params }: { params: { transaction_id: string } }
 ) {
   try {
-    const transactionId = params.transaction_id;
-    if (!transactionId) {
-      return NextResponse.json({ error: 'Transaction ID tidak valid' }, { status: 400 });
-    }
+    const body = await req.json();
+    const { transactionId } = body;
 
     // Parse body
     let bookId: string;

@@ -1,14 +1,14 @@
 // app/api/transactions/[transaction_id]/confirm-pickup/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '../../../../../../lib/supabaseServer';
+import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
 
 export async function POST(
   req: Request,
-  { params }: { params: { transaction_id: string } }
 ) {
   try {
-    const transactionId = params.transaction_id;
+    const body = await req.json();
+    const { transactionId } = body;
 
     if (!transactionId) {
       return NextResponse.json(

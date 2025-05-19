@@ -35,7 +35,7 @@ export default function DashboardPage() {
 
       // Fetch rekomendasi
       try {
-        const res = await fetch(`/api/recommendations/${session.user.id}?limit=5`);
+        const res = await fetch(`/api/recommendations/?limit=5`);
         if (!res.ok) throw new Error('Failed to fetch recommendations');
         const data: Book[] = await res.json();
         setRecommendedBooks(data);

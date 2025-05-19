@@ -1,21 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '../../../../../../lib/supabaseServer';
+import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
 
 export async function POST(
   req: Request,
-  { params }: { params: { transaction_id: string } }
+  
 ) {
   try {
-    console.log('Transaction ID from params:', params.transaction_id);
+    // console.log('Transaction ID from params:', params.transaction_id);
 
-    if (!params.transaction_id) {
-      return NextResponse.json(
-        { error: 'Transaction ID tidak valid' }, 
-        { status: 400 }
-      );
-    }
+    // if (!params.transaction_id) {
+    //   return NextResponse.json(
+    //     { error: 'Transaction ID tidak valid' }, 
+    //     { status: 400 }
+    //   );
+    // }
 
-    const transactionId = params.transaction_id;
+    const body = await req.json();
+    const { transactionId } = body;
     const supabase = createServerSupabaseClient();
 
     // Ambil data transaksi

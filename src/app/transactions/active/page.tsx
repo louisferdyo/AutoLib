@@ -167,8 +167,10 @@ export default function BorrowedBooksPage() {
 
     setActionLoading(transactionId);
     try {
-      const res = await fetch(`/api/transactions/${transactionId}/confirm-pickup`, {
+      const res = await fetch(`/api/transactions/confirm-pickup`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transactionId }),
       });
 
       const data = await res.json();
@@ -190,8 +192,10 @@ export default function BorrowedBooksPage() {
 
     setActionLoading(transactionId);
     try {
-      const res = await fetch(`/api/transactions/${transactionId}/confirm-return`, {
+      const res = await fetch(`/api/transactions/confirm-return`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transactionId }),
       });
 
       const data = await res.json();
@@ -213,10 +217,10 @@ export default function BorrowedBooksPage() {
 
     setActionLoading(transactionId);
     try {
-      const res = await fetch(`/api/transactions/${transactionId}/cancel`, {
+      const res = await fetch(`/api/transactions/cancel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ book_id: bookId }),
+        body: JSON.stringify({ transactionId }),
       });
 
       const data = await res.json();
