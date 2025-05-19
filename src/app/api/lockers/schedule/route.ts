@@ -2,10 +2,11 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getUserActiveLockerSchedules } from '../../../../..//lib/services/lockerService'
-import  supabase  from '../../../../../lib/supabase'
+import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
 
 export async function GET(request: NextRequest) {
   try {
+    const supabase = createServerSupabaseClient();
     // 1. Ambil session user
     const {
       data: { session },

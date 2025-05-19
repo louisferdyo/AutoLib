@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import supabase from '../../../lib/supabase'
+import {createClient} from '../../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 export default function UserActivitiesPage() {
+  const supabase = createClient();
   const [activities, setActivities] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()

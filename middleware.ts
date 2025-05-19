@@ -1,12 +1,13 @@
 // File: middleware.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import supabase from './lib/supabase';
+import {createClient} from './lib/supabase';
 
 // Daftar halaman yang tidak memerlukan autentikasi
 const publicPages = ['/login', '/register', '/'];
 
 export async function middleware(req: NextRequest) {
+  const supabase = createClient();
   const res = NextResponse.next();
   
   // Dapatkan token dari cookies

@@ -1,52 +1,57 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabaseClient } from "../../../../../lib/supabaseServer";
+import { cookies } from 'next/headers';
+import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  // Initialize Supabase client with cookies for auth
   const supabase = createServerSupabaseClient();
-  const body = await req.json();
 
+  // Get authenticated user
   const {
-    user_id,
-    book_id,
-    locker_id,
-    scheduled_pickup_time,
-    scheduled_return_time,
-  } = body as {
-    user_id: string;
-    book_id: string;
-    locker_id: string;
-    scheduled_pickup_time: string;
-    scheduled_return_time: string;
-  };
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  if (
-    !user_id ||
-    !book_id ||
-    !locker_id ||
-    !scheduled_pickup_time ||
-    !scheduled_return_time
-  ) {
+  if (userError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Parse request body
+  const { book_id, locker_id, scheduled_pickup_time, scheduled_return_time } = await req.json();
+
+  // Validate required fields
+  if (!book_id || !locker_id || !scheduled_pickup_time || !scheduled_return_time) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  }
+
+  // Validate return time is at least 3 hours after pickup
+  const pickup = new Date(scheduled_pickup_time);
+  const returnTime = new Date(scheduled_return_time);
+  const diffHours = (returnTime.getTime() - pickup.getTime()) / (1000 * 60 * 60);
+
+  if (diffHours < 3) {
     return NextResponse.json(
-      { error: "Missing required fields" },
+      { error: 'Waktu pengembalian harus minimal 3 jam setelah pengambilan.' },
       { status: 400 }
     );
   }
 
   try {
+    // Insert new borrow transaction
     const { data, error } = await supabase
-      .from("transactions")
+      .from('transactions')
       .insert({
-        user_id,
+        user_id: user.id,
         book_id,
         locker_id,
-        transaction_type: "borrow",
-        scheduled_pickup_time: new Date(scheduled_pickup_time).toISOString(),
-        scheduled_return_time: new Date(scheduled_return_time).toISOString(),
+        transaction_type: 'borrow',
+        scheduled_pickup_time: pickup.toISOString(),
+        scheduled_return_time: returnTime.toISOString(),
         actual_pickup_time: null,
         actual_return_time: null,
-        status: "active", // Tambahan di sini
+        status: 'active',
       })
-      .select()
+      .select('*')
       .single();
 
     if (error) {
@@ -54,13 +59,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     return NextResponse.json(
-      { message: "Borrow transaction created", data },
+      { message: 'Borrow transaction created', data },
       { status: 200 }
     );
+
   } catch (err) {
-    console.error("Unexpected error:", err);
+    console.error('Unexpected error:', err);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import supabase from '../../../lib/supabase';
+import {createClient} from '../../../lib/supabase';
 
 interface Book {
   id: string;
@@ -15,6 +15,7 @@ interface Book {
 }
 
 export default function DashboardPage() {
+  const supabase = createClient();
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
@@ -52,14 +53,12 @@ export default function DashboardPage() {
   if (error)   return <div className="p-6 text-red-600">Error: {error}</div>;
 
   const goToBooks = () => {
-    // Kirim userId ke halaman buku
     router.push(`/books?user_id=${userId}`);
   };
 
-  // const goToBorrow = (bookId: string) => {
-  //   // Kirim userId dan bookId ke halaman borrowBooks
-  //   router.push(`/borrow-books?id=${bookId}&user_id=${userId}`);
-  // };
+  const goToActiveTransactions = () => {
+    router.push(`/transactions/active?user_id=${userId}`);
+  };
 
   return (
     <div className="p-6">
@@ -81,6 +80,13 @@ export default function DashboardPage() {
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
         >
           👤 Go to Profile Page
+        </button>
+
+        <button
+          onClick={goToActiveTransactions}
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
+        >
+          📑 Active Transactions
         </button>
       </div>
 
@@ -112,12 +118,6 @@ export default function DashboardPage() {
                   Rating: {book.average_rating !== null ? book.average_rating.toFixed(1) : 'N/A'}
                 </p>
               </div>
-              {/* <button
-                onClick={() => goToBorrow(book.id)}
-                className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
-              >
-                Pinjam
-              </button> */}
             </li>
           ))}
         </ul>

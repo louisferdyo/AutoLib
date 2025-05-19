@@ -1,11 +1,12 @@
 // app/api/locker_schedules/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import supabase from '../../../../lib/supabase';
+import {createServerSupabaseClient} from '../../../../lib/supabaseServer'
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = createServerSupabaseClient();
     const body = await req.json();
-    const { locker_id, start_time, user_id, transaction_id, type } = body;
+    const { locker_id, start_time, user_id, transaction_id} = body;
 
     if (!locker_id || !start_time || !user_id || !transaction_id) {
       return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
@@ -38,7 +39,6 @@ export async function POST(req: NextRequest) {
         user_id,
         transaction_id,
         status: 'scheduled',
-        type: type || 'pickup', // optional, default pickup
       },
     ]);
 

@@ -5,10 +5,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import supabase from '../../../lib/supabase';
+import {createClient} from '../../../lib/supabase';
 // import type { Database } from "@/types/database.types";
 
 export default function Login() {
+  const supabase = createClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);

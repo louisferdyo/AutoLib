@@ -2,10 +2,11 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { confirmBookPickup } from '../../../../../../lib/services/transactionService'
-import  supabase  from '../../../../../../lib/supabase'
+import { createServerSupabaseClient } from '../../../../../../lib/supabaseServer';
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = createServerSupabaseClient();
     // 1. Validasi body
     const body = await request.json()
     const { transactionId }: { transactionId?: string } = body

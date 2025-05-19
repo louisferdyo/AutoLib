@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import supabase from '../../../lib/supabase';
+import {createClient} from '../../../lib/supabase';
 
 type User = {
   id: string;
@@ -12,6 +12,7 @@ type User = {
 };
 
 export default function ProfilePage() {
+  const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -153,7 +154,7 @@ export default function ProfilePage() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Profil Pengguna</h1>
           <button
-            onClick={() => router.push('/activities')}
+            onClick={() => router.push('/transactions/history')}
             className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md"
           >
             Lihat Aktivitas Pengguna

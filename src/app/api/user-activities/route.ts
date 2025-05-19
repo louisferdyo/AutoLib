@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createServerSupabaseClient } from '../../../../lib/supabaseServer';
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,18 +11,7 @@ export async function GET(req: NextRequest) {
     }
 
     // 👇 Buat Supabase client baru menggunakan access token dari header
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        global: {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      }
-    )
-
+    const supabase = createServerSupabaseClient();
     // 👇 Sekarang getUser() akan bekerja karena token sudah ditanam
     const { data: { user }, error } = await supabase.auth.getUser()
     if (error || !user) {
