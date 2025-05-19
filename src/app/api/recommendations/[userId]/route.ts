@@ -1,22 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import  {createServerSupabaseClient} from '../../../../../lib/supabaseServer';
+import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { userId: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient()
+    const supabase = createServerSupabaseClient();
     const { userId } = params;
-    const url = new URL(request.url);
-    const limit = parseInt(url.searchParams.get('limit') || '5');
+    
+    // Ambil query param 'limit' dari URL
+    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '5');
 
     // Ambil riwayat aktivitas user
     const { data: activities, error: activitiesError } = await supabase
       .from('user_activities')
       .select('book_id')
       .eq('user_id', userId)
-      .in('activity_type', ['borrow', 'read']) // sesuaikan jika perlu
+      .in('activity_type', ['borrow', 'read'])
       .order('created_at', { ascending: false })
       .limit(20);
 
@@ -41,7 +42,7 @@ export async function GET(
         }
       });
 
-      // Hapus duplikat
+      // Hapus duplikat kategori
       userCategories = [...new Set(userCategories)];
     }
 
@@ -61,13 +62,12 @@ export async function GET(
 
     if (error) throw error;
 
-    // Hitung rata-rata rating
+    // Hitung rata-rata rating tiap buku
     const processedBooks = recommendedBooks.map(book => {
       const ratings = book.book_ratings || [];
       const avgRating =
         ratings.length > 0
-          ? ratings.reduce((acc: number, curr: any) => acc + curr.rating, 0) /
-            ratings.length
+          ? ratings.reduce((acc: number, curr: any) => acc + curr.rating, 0) / ratings.length
           : null;
 
       return {
