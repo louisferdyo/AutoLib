@@ -1,16 +1,17 @@
 // src/app/api/books/[id]/route.ts
 import { createServerSupabaseClient } from '../../../../../lib/supabaseServer';
 
-interface RouteParams {
-  params: {
-    id: string;
-  };
-}
+export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request, { params }: RouteParams) {
+// Menggunakan pendekatan tanpa meneruskan parameter atau tipe (param langsung dari URL)
+export async function GET(request: Request) {
   try {
+    // Extract ID dari URL secara manual
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const bookId = pathParts[pathParts.length - 1]; // Ambil ID dari bagian terakhir URL
+    
     const supabase = createServerSupabaseClient();
-    const bookId = params.id;
     
     // Get book details
     const { data: book, error } = await supabase
@@ -27,7 +28,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       return Response.json({ error: 'Book not found' }, { status: 404 });
     }
 
-    return Response.json({ book }, { status: 200 });
+    return Response.json({ book });
   } catch (err) {
     return Response.json({ error: 'An unexpected error occurred' }, { status: 500 });
   }
