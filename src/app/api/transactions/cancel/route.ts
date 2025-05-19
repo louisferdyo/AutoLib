@@ -7,15 +7,10 @@ export async function POST(
 ) {
   try {
     const body = await req.json();
-    const { transactionId } = body;
+    const { transactionId, bookId} = body;
 
     // Parse body
-    let bookId: string;
-    try {
-      const { book_id } = await req.json();
-      if (!book_id) throw new Error();
-      bookId = book_id;
-    } catch {
+    if (!bookId) {
       return NextResponse.json(
         { error: 'Invalid body: sertakan field book_id' },
         { status: 400 }

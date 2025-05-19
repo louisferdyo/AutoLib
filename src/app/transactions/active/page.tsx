@@ -220,7 +220,7 @@ export default function BorrowedBooksPage() {
       const res = await fetch(`/api/transactions/cancel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transactionId }),
+        body: JSON.stringify({ transactionId, bookId }),
       });
 
       const data = await res.json();
