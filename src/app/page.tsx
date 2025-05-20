@@ -27,7 +27,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
       {/* Navigation */}
       <nav className="bg-white shadow-sm z-20 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -142,7 +142,7 @@ export default function HomePage() {
                   <div className="rounded-md shadow">
                     <button
                       onClick={() => router.push('/books')}
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-in-out md:py-4 md:text-lg md:px-10"
+                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-in-out md:py-4 md:text-lg md:px-10 relative z-10"
                     >
                       Browse Books
                     </button>
@@ -150,7 +150,7 @@ export default function HomePage() {
                   <div className="mt-3 sm:mt-0 sm:ml-3">
                     <button
                       onClick={() => router.push('/register')}
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 transform hover:-translate-y-1 hover:shadow-md transition-all duration-300 ease-in-out md:py-4 md:text-lg md:px-10"
+                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 transform hover:-translate-y-1 hover:shadow-md transition-all duration-300 ease-in-out md:py-4 md:text-lg md:px-10 relative z-10"
                     >
                       Get RFID Card
                     </button>
@@ -433,7 +433,7 @@ export default function HomePage() {
             <div className="inline-flex rounded-md shadow">
               <button
                 onClick={() => router.push('/register')}
-                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transform hover:scale-105 hover:shadow-lg transition-all duration-300"
+                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transform hover:scale-105 hover:shadow-lg transition-all duration-300 relative z-10"
               >
                 Get started
               </button>
@@ -441,7 +441,7 @@ export default function HomePage() {
             <div className="mt-3 sm:mt-0 sm:ml-3">
               <button
                 onClick={() => router.push('/login')}
-                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transform hover:scale-105 hover:shadow-md transition-all duration-300"
+                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transform hover:scale-105 hover:shadow-md transition-all duration-300 relative z-10"
               >
                 Login
               </button>
@@ -500,6 +500,24 @@ export default function HomePage() {
           </p>
         </div>
       </footer>
+      
+      {/* Font and button fixes */}
+      <style jsx global>{`
+        /* 1. Font fix for mobile devices */
+        html, body {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+        
+        /* 2. Fixes for white rectangle behind Get Started button */
+        button, a {
+          position: relative;
+          z-index: 10;
+        }
+        
+        .bg-indigo-50 {
+          position: relative;
+        }
+      `}</style>
     </div>
   )
 }
