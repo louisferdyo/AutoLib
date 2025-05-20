@@ -133,7 +133,7 @@ export default function DashboardPage() {
                 Selamat datang di dashboard AutoLib, tempat Anda dapat menjelajahi buku, meminjam, dan mengelola aktivitas perpustakaan Anda.
               </p>
               <div className="bg-indigo-50/80 backdrop-blur-sm p-3 rounded-lg text-sm text-indigo-700 font-mono inline-block">
-                ID Pengguna: {userId}...
+                ID Pengguna: {userId}
               </div>
             </div>
 
