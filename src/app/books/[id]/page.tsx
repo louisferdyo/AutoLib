@@ -20,7 +20,7 @@ interface Book {
 
 export default function BookDetailPage() {
   const router = useRouter();
-  const setBookId = useBorrowStore((state) => state.setBookId);
+  const setBookId = useBorrowStore((state: any) => state.setBookId);
    
   const params = useParams();
   const id = params?.id as string;

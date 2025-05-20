@@ -1,16 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-// import { useSearchParams } from 'next/navigation';
 import {createClient} from '../../../lib/supabase';
 import { useBorrowStore } from '../../stores/useBorrowState';
+import Link from 'next/link';
+
 interface Locker {
   id: string;
   locker_name: string;
 }
 
 export default function BorrowBooksPage() {
-  const bookId = useBorrowStore((state) => state.bookId);
+  const bookId = useBorrowStore((state: any) => state.bookId);
 
   const [userId, setUserId] = useState<string | null>(null);
   const [scheduledPickup, setScheduledPickup] = useState('');
@@ -217,8 +218,6 @@ export default function BorrowBooksPage() {
       const returnData = await returnScheduleRes.json();
       if (!returnScheduleRes.ok) throw new Error(returnData.error || 'Gagal menjadwalkan loker pengembalian');
       
-      
-
       // 5. Update book quantity (decrease by 1) - only after transaction is confirmed
       const updateQuantityRes = await fetch('/api/books/update-quantity/', {
         method: 'POST',
@@ -241,94 +240,209 @@ export default function BorrowBooksPage() {
     } finally {
       setStatus(prev => prev === 'submitting' ? 'idle' : prev);
     }
-    
   };
   
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h1 className="text-xl font-bold mb-4">Peminjaman Buku</h1>
-      <p className="mb-2">ID Buku: {bookId}</p>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-purple-100 to-indigo-100 font-sans">
+      {/* Header/Navigation */}
+      <nav className="bg-white/80 backdrop-blur-sm shadow-sm z-20 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex">
+              <div className="flex-shrink-0 flex items-center">
+                <Link href="/" className="text-xl font-bold text-purple-600 hover:text-purple-800 transition duration-300">
+                  <span className="text-indigo-600">Auto</span>Lib
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
 
-      <label className="block mb-1">Waktu Ambil:</label>
-      <input
-        type="datetime-local"
-        // min={pickupMin}    
-        step="3600"
-        value={scheduledPickup}
-        onChange={e => {
-          const date = new Date(e.target.value);
-          date.setMinutes(0, 0, 0); // pastikan menit 0
-          setScheduledPickup(toLocalISOString(date));
-        }}
-        className="w-full mb-3 border px-2 py-1"
-      />
+      {/* Decorative circles */}
+      <div className="absolute top-40 left-20 w-64 h-64 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+      <div className="absolute top-20 right-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-40 left-1/2 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
-      <label className="block mb-1">Waktu Kembali:</label>
-      <input
-        type="datetime-local"
-        step="3600"
-        min={returnMin}                  // ← tambahkan ini
-        value={scheduledReturn}
-        onChange={e => {
-          const date = new Date(e.target.value);
-          date.setMinutes(0, 0, 0);
-          setScheduledReturn(toLocalISOString(date));
-        }}
-        className="w-full mb-3 border px-2 py-1"
-      />
+      {/* Main Content */}
+      <div className="flex-grow flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 relative z-10">
+        <div className="w-full max-w-md">
+          <div className="bg-white/80 backdrop-blur-sm py-8 px-6 sm:px-10 rounded-2xl shadow-xl border border-indigo-100">
+            <h1 className="text-2xl font-bold mb-4 text-indigo-700 text-center">Peminjaman Buku</h1>
+            <p className="mb-4 text-indigo-600 bg-indigo-50 p-3 rounded-lg text-center font-medium">
+              ID Buku: <span className="text-purple-600 font-semibold">{bookId}</span>
+            </p>
 
+            <div className="space-y-6">
+              <div className="group">
+                <label className="block mb-1 text-indigo-600 font-medium">Waktu Ambil:</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="datetime-local"
+                    step="3600"
+                    value={scheduledPickup}
+                    onChange={e => {
+                      const date = new Date(e.target.value);
+                      date.setMinutes(0, 0, 0); // pastikan menit 0
+                      setScheduledPickup(toLocalISOString(date));
+                    }}
+                    className="appearance-none block w-full pl-10 pr-3 py-2 border border-indigo-200 rounded-lg shadow-sm placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 bg-white/70 backdrop-blur-sm"
+                  />
+                </div>
+              </div>
 
-      <div className="mb-3">
-        <label className="block mb-1">Pilih Loker Ambil:</label>
-        <select
-          value={pickupLockerId}
-          onChange={e => setPickupLockerId(e.target.value)}
-          className="w-full border px-2 py-1 mb-2"
-        >
-          <option value="">-- Pilih Loker --</option>
-          {pickupLockers.map(l => (
-            <option key={l.id} value={l.id}>
-              {l.locker_name}
-            </option>
-          ))}
-        </select>
-        {pickupLockers.length === 0 && scheduledPickup && (
-          <p className="text-sm text-gray-600">Tidak ada loker untuk waktu ambil.</p>
-        )}
+              <div className="group">
+                <label className="block mb-1 text-indigo-600 font-medium">Waktu Kembali:</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="datetime-local"
+                    step="3600"
+                    min={returnMin}
+                    value={scheduledReturn}
+                    onChange={e => {
+                      const date = new Date(e.target.value);
+                      date.setMinutes(0, 0, 0);
+                      setScheduledReturn(toLocalISOString(date));
+                    }}
+                    className="appearance-none block w-full pl-10 pr-3 py-2 border border-indigo-200 rounded-lg shadow-sm placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 bg-white/70 backdrop-blur-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="group">
+                <label className="block mb-1 text-indigo-600 font-medium">Pilih Loker Ambil:</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                  </div>
+                  <select
+                    value={pickupLockerId}
+                    onChange={e => setPickupLockerId(e.target.value)}
+                    className="appearance-none block w-full pl-10 pr-3 py-2 border border-indigo-200 rounded-lg shadow-sm placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 bg-white/70 backdrop-blur-sm"
+                  >
+                    <option value="">-- Pilih Loker --</option>
+                    {pickupLockers.map(l => (
+                      <option key={l.id} value={l.id}>
+                        {l.locker_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {pickupLockers.length === 0 && scheduledPickup && (
+                  <p className="text-sm text-purple-600 mt-1">Tidak ada loker untuk waktu ambil.</p>
+                )}
+              </div>
+
+              <div className="group">
+                <label className="block mb-1 text-indigo-600 font-medium">Pilih Loker Kembali:</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                  </div>
+                  <select
+                    value={returnLockerId}
+                    onChange={e => setReturnLockerId(e.target.value)}
+                    className="appearance-none block w-full pl-10 pr-3 py-2 border border-indigo-200 rounded-lg shadow-sm placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 bg-white/70 backdrop-blur-sm"
+                  >
+                    <option value="">-- Pilih Loker --</option>
+                    {returnLockers.map(l => (
+                      <option key={l.id} value={l.id}>
+                        {l.locker_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {returnLockers.length === 0 && scheduledReturn && (
+                  <p className="text-sm text-purple-600 mt-1">Tidak ada loker untuk waktu kembali.</p>
+                )}
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={status === 'submitting'}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-105"
+              >
+                {status === 'submitting' ? (
+                  <div className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Memproses...
+                  </div>
+                ) : 'Kirim'}
+              </button>
+
+              {message && (
+                <div className={`p-4 rounded-lg ${status === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'} animate-fadeIn`}>
+                  {message}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="mb-3">
-        <label className="block mb-1">Pilih Loker Kembali:</label>
-        <select
-          value={returnLockerId}
-          onChange={e => setReturnLockerId(e.target.value)}
-          className="w-full border px-2 py-1 mb-2"
-        >
-          <option value="">-- Pilih Loker --</option>
-          {returnLockers.map(l => (
-            <option key={l.id} value={l.id}>
-              {l.locker_name}
-            </option>
-          ))}
-        </select>
-        {returnLockers.length === 0 && scheduledReturn && (
-          <p className="text-sm text-gray-600">Tidak ada loker untuk waktu kembali.</p>
-        )}
-      </div>
+      {/* Footer */}
+      <footer className="bg-white/80 backdrop-blur-sm py-4 border-t border-indigo-100 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm text-indigo-500">
+            &copy; 2025 AutoLib. All rights reserved.
+          </p>
+        </div>
+      </footer>
 
-      <button
-        onClick={handleSubmit}
-        disabled={status === 'submitting'}
-        className="bg-blue-600 text-white px-4 py-2 rounded w-full"
-      >
-        {status === 'submitting' ? 'Memproses...' : 'Kirim'}
-      </button>
-
-      {message && (
-        <p className={`mt-2 ${status === 'error' ? 'text-red-600' : 'text-green-600'}`}>
-          {message}
-        </p>
-      )}
+      {/* Font fix & Animation*/}
+      <style jsx global>{`
+        html, body {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+          background: linear-gradient(to bottom right, #dbeafe, #f3e8ff, #e0e7ff);
+        }
+        @keyframes blob {
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -30px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+        @keyframes fadeIn {
+          0% { opacity: 0; transform: translateY(-10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 }
