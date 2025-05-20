@@ -106,13 +106,13 @@ export default function BorrowedBooksPage() {
       if (error) throw error;
 
       // Process data to normalize the books field
-      const processedData = data.map(tx => ({
+      const processedData = data.map((tx: any) => ({
         ...tx,
         books:
           Array.isArray(tx.books)
             ? tx.books[0] || { title: '', author: '' }
             : tx.books || { title: '', author: '' },
-      }));
+      })) as Transaction[];
 
       // 1. Waiting - "Menunggu Pengembalian" (status = waiting)
       const waiting = processedData.filter(tx => tx.status === 'waiting');

@@ -63,7 +63,7 @@ export default function HistoryPage() {
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <Link href="/" className="text-xl font-bold text-purple-600 hover:text-purple-800 transition duration-300">
+                <Link href="/dashboard" className="text-xl font-bold text-purple-600 hover:text-purple-800 transition duration-300">
                   <span className="text-indigo-600">Auto</span>Lib
                 </Link>
               </div>
