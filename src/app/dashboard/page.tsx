@@ -72,14 +72,55 @@ export default function DashboardPage() {
       <nav className="bg-white/80 backdrop-blur-sm shadow-sm z-20 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <Link href="/dashboard" className="text-xl font-bold text-purple-600 hover:text-purple-800 transition duration-300">
-                  <span className="text-indigo-600">Auto</span>Lib
-                </Link>
-              </div>
+
+            {/* Logo */}
+            <div className="flex-shrink-0 flex items-center">
+              <Link href="/dashboard" className="text-xl font-bold text-purple-800 hover:text-purple-900 transition duration-300">
+                <span className="text-indigo-800">Auto</span>Lib
+              </Link>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="hidden md:flex items-center space-x-1">
+              <Link
+                href="/books"
+                className="px-3 py-2 rounded-md text-sm font-medium text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 transition duration-300"
+              >
+                Jelajahi
+              </Link>
+
+              <Link
+                href="/dashboard"
+                className="px-3 py-2 rounded-md text-sm font-medium text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 transition duration-300"
+              >
+                Dashboard
+              </Link>
+              
+              <Link
+                href="/transactions/active"
+                className="px-3 py-2 rounded-md text-sm font-medium text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 transition duration-300"
+              >
+                Transaksi
+              </Link>
+
+              <Link
+                href="/transactions/history"
+                className="px-3 py-2 rounded-md text-sm font-medium text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 transition duration-300"
+              >
+                Riwayat
+              </Link>
+
+              <Link
+                href="/profile"
+                className="px-3 py-2 rounded-md text-sm font-medium text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 transition duration-300"
+              >
+                Profil
+              </Link>
+
             </div>
             <div className="flex items-center space-x-4">
+              
+              
               <Link
                 href="/profile"
                 className="text-indigo-600 hover:text-indigo-800 transition duration-300 text-sm font-medium"
