@@ -1,61 +1,26 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import {createClient} from '../../../lib/supabase'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
-export default function UserActivitiesPage() {
-  const supabase = createClient();
-  const [activities, setActivities] = useState<any[]>([])
-  const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
-
-  useEffect(() => {
-    async function fetchActivitiesDirectly() {
-      const { data: { session } } = await supabase.auth.getSession()
-
-      if (!session) {
-        setError('Unauthorized')
-        router.push('/login')
-        return
-      }
-
-      const user = session.user
-
-      const { data, error: dbError } = await supabase
-        .from('user_activities')
-        .select(`
-          *,
-          users:user_id (
-            full_name,
-            email
-          )
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      if (dbError) {
-        setError(dbError.message)
-      } else {
-        setActivities(data || [])
-      }
-    }
-
-    fetchActivitiesDirectly()
-  }, [])
-
-  if (error) return <div className="p-6 text-red-600">Error: {error}</div>
-
+export default function Home() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Your Activities</h1>
-      <ul className="space-y-2">
-        {activities.map((a, i) => (
-          <li key={i} className="bg-gray-100 p-4 rounded">
-            <strong>{a.activity_type}</strong>: {a.description}
-          </li>
-        ))}
-      </ul>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-200 to-blue-100">
+      <div className="text-center p-8 bg-white shadow-xl rounded-xl max-w-md w-full">
+        <h1 className="text-4xl font-extrabold text-indigo-700 mb-4">Welcome to BookTrack</h1>
+        <p className="text-gray-600 mb-6">Track your books, activities, and transactions easily.</p>
+        <div className="flex justify-center space-x-4">
+          <Link href="/login">
+            <button className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-semibold">
+              Login
+            </button>
+          </Link>
+          <Link href="/register">
+            <button className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition font-semibold">
+              Register
+            </button>
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }
