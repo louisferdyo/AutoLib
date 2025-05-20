@@ -23,7 +23,7 @@ export default function EnhancedHeroIllustration() {
             <div className="relative">
               <div className="absolute inset-0 bg-indigo-500 rounded shadow-inner"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                {/* Book in locker */}
+                {/* Single book in locker - ONLY ONE BOOK */}
                 <div className="w-10 h-14 bg-white rounded-sm shadow-md transform rotate-6">
                   <div className="h-full w-2 bg-yellow-500 absolute left-0 rounded-l-sm"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -76,42 +76,21 @@ export default function EnhancedHeroIllustration() {
           </div>
         </div>
         
-        {/* User silhouette */}
-        <div className="absolute -left-4 bottom-16 sm:bottom-20">
+        {/* User silhouette - FIXED: Removed the white line and positioned better */}
+        <div className="absolute left-12 sm:left-10 bottom-16 sm:bottom-20">
           <div className="relative">
             <div className="w-10 h-10 rounded-full bg-indigo-900 shadow"></div>
             <div className="w-16 h-28 bg-indigo-900 rounded-t-3xl absolute -bottom-28 left-1/2 transform -translate-x-1/2"></div>
-            <div className="w-6 h-1 bg-white rounded absolute top-5 left-2 opacity-75"></div>
+            {/* Removed the white line across the head */}
           </div>
         </div>
         
-        {/* Animated book floating */}
-        <div className="absolute -left-16 sm:-left-24 top-1/3 transform -translate-y-1/2 animate-float" style={{animationDelay: '1.5s'}}>
-          <div className="w-12 h-16 bg-white rounded-sm shadow-lg transform -rotate-12">
-            <div className="h-full w-2 bg-red-500 absolute left-0 rounded-l-sm"></div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-1">
-              <div className="w-8 h-0.5 bg-gray-300 mb-1"></div>
-              <div className="w-8 h-0.5 bg-gray-300 mb-1"></div>
-              <div className="w-6 h-0.5 bg-gray-300"></div>
-            </div>
-          </div>
-        </div>
+        {/* Removed the floating book entirely as requested */}
       </div>
       
-      {/* Add floating decorative elements */}
-      <div className="absolute top-10 right-10 text-indigo-300 opacity-20 animate-pulse">
-        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582a1 1 0 01.646.942V9.5a1 1 0 01-.5.866l-4 2.31v.323a1 1 0 01-2 0v-.323l-4-2.31a1 1 0 01-.5-.866V6.847a1 1 0 01.646-.942L9 4.323V3a1 1 0 011-1zm-4 8l4 2.31 4-2.31V7.027l-4-1.582-4 1.582V10z" clipRule="evenodd" />
-        </svg>
-      </div>
+      {/* Removed small transparent book logo next to the person */}
       
-      <div className="absolute bottom-8 left-8 text-indigo-300 opacity-20 animate-pulse" style={{animationDelay: '2s'}}>
-        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
-        </svg>
-      </div>
-      
-      {/* Add some CSS animations */}
+      {/* CSS animations */}
       <style jsx>{`
         @keyframes float {
           0% { transform: translateY(0px) rotate(12deg); }

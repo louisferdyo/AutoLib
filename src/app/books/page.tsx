@@ -121,7 +121,7 @@ export default function BooksPage() {
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <Link href="/" className="text-xl font-bold text-purple-600 hover:text-purple-800 transition duration-300">
+                <Link href="/dashboard" className="text-xl font-bold text-purple-600 hover:text-purple-800 transition duration-300">
                   <span className="text-indigo-600">Auto</span>Lib
                 </Link>
               </div>
@@ -150,7 +150,7 @@ export default function BooksPage() {
             <input
               type="text"
               placeholder="Search by title, author, or ISBN..."
-              className="w-full pl-10 pr-3 py-2 border border-indigo-200 rounded-lg shadow-sm placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 bg-white/70 backdrop-blur-sm"
+              className="appearance-none block w-full pl-10 pr-3 py-2 border border-indigo-200 rounded-lg shadow-sm placeholder-indigo-300 text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 bg-white/70 backdrop-blur-sm sm:text-sm"
               onChange={handleSearchChange}
             />
           </div>
@@ -161,7 +161,7 @@ export default function BooksPage() {
               </svg>
             </div>
             <select
-              className="w-full pl-10 pr-3 py-2 border border-indigo-200 rounded-lg shadow-sm placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 bg-white/70 backdrop-blur-sm appearance-none"
+              className="w-full pl-10 pr-3 py-2 border border-indigo-200 rounded-lg shadow-sm placeholder-indigo-300 text-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 bg-white/70 backdrop-blur-sm appearance-none"
               value={selectedCategory}
               onChange={handleCategoryChange}
             >
@@ -304,6 +304,11 @@ export default function BooksPage() {
         html, body {
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
           background: linear-gradient(to bottom right, #dbeafe, #f3e8ff, #e0e7ff);
+        }
+        /* Tambahkan styling untuk opsi dropdown */
+        option {
+          color: #3730a3; /* Indigo-800 */
+          background-color: white;
         }
         @keyframes blob {
           0% {

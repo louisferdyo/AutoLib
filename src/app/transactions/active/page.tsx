@@ -106,13 +106,13 @@ export default function BorrowedBooksPage() {
       if (error) throw error;
 
       // Process data to normalize the books field
-      const processedData = data.map(tx => ({
+      const processedData = data.map((tx: any) => ({
         ...tx,
         books:
           Array.isArray(tx.books)
             ? tx.books[0] || { title: '', author: '' }
             : tx.books || { title: '', author: '' },
-      }));
+      })) as Transaction[];
 
       // 1. Waiting - "Menunggu Pengembalian" (status = waiting)
       const waiting = processedData.filter(tx => tx.status === 'waiting');
@@ -385,7 +385,7 @@ export default function BorrowedBooksPage() {
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <Link href="/" className="text-xl font-bold text-purple-600 hover:text-purple-800 transition duration-300">
+                <Link href="/dashboard" className="text-xl font-bold text-purple-600 hover:text-purple-800 transition duration-300">
                   <span className="text-indigo-600">Auto</span>Lib
                 </Link>
               </div>
