@@ -138,7 +138,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
               <button
                 onClick={() => router.push(`/books?user_id=${userId}`)}
                 className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md p-6 border border-indigo-100 transition duration-300 hover:shadow-lg hover:scale-105 text-left"
@@ -182,6 +182,21 @@ export default function DashboardPage() {
                   <h2 className="text-lg font-semibold text-indigo-800">Transaksi Aktif</h2>
                 </div>
                 <p className="text-indigo-600 text-sm">Lihat peminjaman buku aktif dan riwayat Anda.</p>
+              </button>
+
+              <button
+                onClick={() => router.push(`/transactions/history?user_id=${userId}`)}
+                className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md p-6 border border-indigo-100 transition duration-300 hover:shadow-lg hover:scale-105 text-left"
+              >
+                <div className="flex items-center mb-3">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
+                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-lg font-semibold text-indigo-800">Riwayat</h2>
+                </div>
+                <p className="text-indigo-600 text-sm">Lihat riwayat peminjaman buku Anda.</p>
               </button>
             </div>
 

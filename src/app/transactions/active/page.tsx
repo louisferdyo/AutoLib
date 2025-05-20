@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {createClient} from '../../../../lib/supabase';
+import Link from 'next/link';
+import { createClient } from '../../../../lib/supabase';
 
 type Transaction = {
   id: string;
@@ -31,6 +32,7 @@ export default function BorrowedBooksPage() {
   const [message, setMessage] = useState('');
   const router = useRouter();
   const supabase = createClient();
+
   useEffect(() => {
     fetchTransactions();
     
@@ -126,14 +128,7 @@ export default function BorrowedBooksPage() {
         return currentTime <= pickupDeadline;
       });
       
-  
-
-      // 3. Active - "Sedang Dipinjam" (status = active && actual_pickup_time is not null)
-      // const canceledPickUp = processedData.filter(tx => 
-      //   tx.status === 'canceled' 
-      // );
-      
-      // 4. Active Late Pickup - past pickup window
+      // 3. Active Late Pickup - past pickup window
       const activeLate = processedData.filter(tx => {
         if (tx.status !== 'active' || tx.actual_pickup_time !== null) return false;
         
@@ -144,13 +139,12 @@ export default function BorrowedBooksPage() {
         return currentTime > pickupDeadline;
       });
       
-      // 5. Late (status = late)
+      // 4. Late (status = late)
       const late = processedData.filter(tx => tx.status === 'late');
       const canceled = processedData.filter(tx => tx.status === 'canceled');
 
       setWaitingTransactions(waiting);
       setActivePickupTransactions(activePickup);
-      // setWaitingReturnTransactions(waitingReturn);
       setActiveLatePickup(activeLate);
       setLateTransactions(late);
       setCanceledTransactions(canceled);
@@ -274,31 +268,44 @@ export default function BorrowedBooksPage() {
     });
 
   const renderTransactionCard = (tx: Transaction, section: string) => (
-    <li key={tx.id} className={`p-6 shadow rounded-lg border ${
-      section === 'late' ? 'bg-red-50 border-red-300' : 
-      section === 'activeLate' ? 'bg-yellow-50 border-yellow-300' : 
-      'bg-white border-gray-200'
+    <li key={tx.id} className={`p-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-102 ${
+      section === 'late' ? 'bg-red-50/80 backdrop-blur-sm border border-red-200' : 
+      section === 'activeLate' ? 'bg-yellow-50/80 backdrop-blur-sm border border-yellow-200' : 
+      section === 'canceled' ? 'bg-gray-50/80 backdrop-blur-sm border border-gray-200' : 
+      'bg-white/70 backdrop-blur-sm border border-indigo-100'
     }`}>
-      <h2 className="font-semibold text-xl">{tx.books.title}</h2>
-      <p className="text-gray-600 mb-2">Penulis: {tx.books.author}</p>
-      <div className="space-y-1 mb-4 text-sm text-gray-600">
-        <p><span className="font-medium">Status:</span> {tx.status}</p>
-        <p><span className="font-medium">Jadwal Ambil:</span> {formatDate(tx.scheduled_pickup_time)}</p>
-        {tx.actual_pickup_time && <p><span className="font-medium">Diambil pada:</span> {formatDate(tx.actual_pickup_time)}</p>}
-        <p><span className="font-medium">Jadwal Kembali:</span> {formatDate(tx.scheduled_return_time)}</p>
-        {tx.actual_return_time && <p><span className="font-medium">Dikembalikan pada:</span> {formatDate(tx.actual_return_time)}</p>}
+      <h2 className="font-semibold text-xl text-indigo-700">{tx.books.title}</h2>
+      <p className="text-purple-600 mb-3">Penulis: {tx.books.author}</p>
+      <div className="space-y-1 mb-4 text-sm">
+        <p><span className="font-medium text-indigo-600">Status:</span> 
+          <span className={`ml-1 ${
+            tx.status === 'late' ? 'text-red-600' : 
+            tx.status === 'waiting' ? 'text-green-600' : 
+            tx.status === 'active' ? 'text-blue-600' :
+            tx.status === 'canceled' ? 'text-gray-600' : 'text-gray-600'
+          }`}>
+            {tx.status === 'waiting' ? 'Menunggu Pengembalian' : 
+             tx.status === 'active' ? 'Aktif' : 
+             tx.status === 'late' ? 'Terlambat' : 
+             tx.status === 'canceled' ? 'Dibatalkan' : tx.status}
+          </span>
+        </p>
+        <p><span className="font-medium text-indigo-600">Jadwal Ambil:</span> {formatDate(tx.scheduled_pickup_time)}</p>
+        {tx.actual_pickup_time && <p><span className="font-medium text-indigo-600">Diambil pada:</span> {formatDate(tx.actual_pickup_time)}</p>}
+        <p><span className="font-medium text-indigo-600">Jadwal Kembali:</span> {formatDate(tx.scheduled_return_time)}</p>
+        {tx.actual_return_time && <p><span className="font-medium text-indigo-600">Dikembalikan pada:</span> {formatDate(tx.actual_return_time)}</p>}
       </div>
 
-      <div className="flex flex-wrap gap-2 mt-4">
+      <div className="flex flex-wrap gap-2 mt-5">
         {/* Button for Waiting section - now it's for returns not pickups */}
         {section === 'waiting' && (
           <button
             onClick={() => handleConfirmReturn(tx.id)}
             disabled={actionLoading === tx.id || !canReturn(tx)}
-            className={`py-2 px-4 rounded text-white ${
+            className={`py-2 px-4 rounded-lg text-white transition-colors duration-300 shadow-sm ${
               actionLoading === tx.id || !canPickup(tx)
                 ? 'bg-gray-400 cursor-not-allowed'
-                : "bg-green-600 hover:bg-green-70  text-white py-2 px-4 rounded" 
+                : "bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600" 
             }`}
           >
             {actionLoading === tx.id ? 'Memproses...' : 'Konfirmasi Pengembalian'}
@@ -310,10 +317,10 @@ export default function BorrowedBooksPage() {
           <button
             onClick={() => handleConfirmPickup(tx.id)}
             disabled={actionLoading === tx.id || !canPickup(tx)}
-            className={`py-2 px-4 rounded text-white ${
+            className={`py-2 px-4 rounded-lg text-white shadow-sm transition-colors duration-300 ${
               actionLoading === tx.id || !canPickup(tx)
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'
             }`}
           >
             {actionLoading === tx.id ? 'Memproses...' : 'Konfirmasi Pengambilan'}
@@ -325,7 +332,7 @@ export default function BorrowedBooksPage() {
           <button
             onClick={() => handleConfirmReturn(tx.id)}
             disabled={actionLoading === tx.id}
-            className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded"
+            className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white py-2 px-4 rounded-lg shadow-sm transition-colors duration-300"
           >
             {actionLoading === tx.id ? 'Memproses...' : 'Konfirmasi Pengembalian'}
           </button>
@@ -336,7 +343,7 @@ export default function BorrowedBooksPage() {
           <button
             onClick={() => handleConfirmReturn(tx.id)}
             disabled={actionLoading === tx.id}
-            className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded"
+            className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white py-2 px-4 rounded-lg shadow-sm transition-colors duration-300"
           >
             {actionLoading === tx.id ? 'Memproses...' : 'Konfirmasi Pengembalian'}
           </button>
@@ -347,7 +354,7 @@ export default function BorrowedBooksPage() {
           <button
             onClick={() => handleCancelBooking(tx.id, tx.book_id)}
             disabled={actionLoading === tx.id}
-            className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded"
+            className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white py-2 px-4 rounded-lg shadow-sm transition-colors duration-300"
           >
             {actionLoading === tx.id ? 'Memproses...' : 'Batalkan Peminjaman'}
           </button>
@@ -355,14 +362,14 @@ export default function BorrowedBooksPage() {
 
         {/* Late pickup message */}
         {section === 'activeLate' && (
-          <p className="text-yellow-700 font-semibold w-full">
+          <p className="text-yellow-700 font-semibold w-full bg-yellow-100/50 p-3 rounded-lg">
             Anda terlambat mengambil buku. Silakan hubungi pustakawan untuk informasi lebih lanjut.
           </p>
         )}
 
         {/* Late return message */}
         {section === 'late' && (
-          <p className="text-red-600 font-semibold w-full">
+          <p className="text-red-600 font-semibold w-full bg-red-100/50 p-3 rounded-lg">
             Buku terlambat dikembalikan. Anda mungkin dikenakan denda. Segera kembalikan buku.
           </p>
         )}
@@ -371,77 +378,133 @@ export default function BorrowedBooksPage() {
   );
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Daftar Peminjaman Buku</h1>
-      {loading && <p>Memuat data...</p>}
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-purple-100 to-indigo-100 font-sans">
+      {/* Header/Navigation */}
+      <nav className="bg-white/80 backdrop-blur-sm shadow-sm z-20 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex">
+              <div className="flex-shrink-0 flex items-center">
+                <Link href="/" className="text-xl font-bold text-purple-600 hover:text-purple-800 transition duration-300">
+                  <span className="text-indigo-600">Auto</span>Lib
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
 
-      {error && (
-        <p className="mb-4 text-red-600 font-semibold">{error}</p>
-      )}
+      {/* Decorative circles */}
+      <div className="absolute top-40 left-20 w-64 h-64 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+      <div className="absolute top-20 right-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-40 left-1/2 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
-      {message && (
-        <p className="mb-4 text-green-600 font-semibold">{message}</p>
-      )}
-
-      {/* 1. Waiting Transactions - now for returning books */}
-      <section className="mb-8">
-        <h2 className="text-lg font-semibold mb-3">Waiting (Menunggu Pengembalian)</h2>
-        {waitingTransactions.length === 0 ? (
-          <p>Tidak ada peminjaman yang menunggu pengembalian.</p>
-        ) : (
-          <ul className="space-y-6">
-            {waitingTransactions.map(tx => renderTransactionCard(tx, 'waiting'))}
-          </ul>
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8 relative z-10 flex-grow">
+        <h1 className="text-2xl font-bold mb-6 text-indigo-700">Daftar Peminjaman Buku</h1>
+        
+        {loading && (
+          <div className="flex justify-center my-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+          </div>
         )}
-      </section>
 
-      {/* 2. Active Transactions: Waiting to be picked up */}
-      <section className="mb-8">
-        <h2 className="text-lg font-semibold mb-3">Active (Menunggu Pengambilan)</h2>
-        {activePickupTransactions.length === 0 ? (
-          <p>Tidak ada buku yang siap diambil saat ini.</p>
-        ) : (
-          <ul className="space-y-6">
-            {activePickupTransactions.map(tx => renderTransactionCard(tx, 'activePickup'))}
-          </ul>
+        {error && (
+          <div className="mb-6 px-4 py-3 bg-red-100/80 backdrop-blur-sm border border-red-200 rounded-lg text-red-700">
+            {error}
+          </div>
         )}
-      </section>
 
-      {/* 3. Active Transactions: Currently borrowed
-      <section className="mb-8">
-        <h2 className="text-lg font-semibold mb-3">Active (Sedang Dipinjam)</h2>
-        {waitingReturnTransactions.length === 0 ? (
-          <p>Tidak ada buku yang sedang dipinjam.</p>
-        ) : (
-          <ul className="space-y-6">
-            {waitingReturnTransactions.map(tx => renderTransactionCard(tx, 'waitingReturn'))}
-          </ul>
+        {message && (
+          <div className="mb-6 px-4 py-3 bg-green-100/80 backdrop-blur-sm border border-green-200 rounded-lg text-green-700">
+            {message}
+          </div>
         )}
-      </section> */}
 
-      {/* 4. Active Transactions: Late for pickup */}
-      <section className="mb-8">
-        <h2 className="text-lg font-semibold mb-3 text-yellow-700">Canceled</h2>
-        {canceledTransactions.length === 0 ? (
-          <p>Tidak ada transaksi yang dibatalkan.</p>
-        ) : (
-          <ul className="space-y-6">
-            {canceledTransactions.map(tx => renderTransactionCard(tx, 'canceled'))}
-          </ul>
-        )}
-      </section>
+        {/* 1. Waiting Transactions - now for returning books */}
+        <section className="mb-8">
+          <h2 className="text-lg font-semibold mb-4 text-indigo-700 border-b border-indigo-200 pb-2">Menunggu Pengembalian</h2>
+          {waitingTransactions.length === 0 ? (
+            <p className="bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow-sm text-indigo-600">Tidak ada peminjaman yang menunggu pengembalian.</p>
+          ) : (
+            <ul className="space-y-6">
+              {waitingTransactions.map(tx => renderTransactionCard(tx, 'waiting'))}
+            </ul>
+          )}
+        </section>
 
-      {/* 5. Late Transactions (Terlambat Dikembalikan) */}
-      <section className="mb-8">
-        <h2 className="text-lg font-semibold mb-3 text-red-600">Terlambat Dikembalikan</h2>
-        {lateTransactions.length === 0 ? (
-          <p>Tidak ada buku yang terlambat dikembalikan.</p>
-        ) : (
-          <ul className="space-y-6">
-            {lateTransactions.map(tx => renderTransactionCard(tx, 'late'))}
-          </ul>
-        )}
-      </section>
-    </main>
+        {/* 2. Active Transactions: Waiting to be picked up */}
+        <section className="mb-8">
+          <h2 className="text-lg font-semibold mb-4 text-indigo-700 border-b border-indigo-200 pb-2">Menunggu Pengambilan</h2>
+          {activePickupTransactions.length === 0 ? (
+            <p className="bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow-sm text-indigo-600">Tidak ada buku yang siap diambil saat ini.</p>
+          ) : (
+            <ul className="space-y-6">
+              {activePickupTransactions.map(tx => renderTransactionCard(tx, 'activePickup'))}
+            </ul>
+          )}
+        </section>
+
+        {/* 4. Canceled Transactions */}
+        <section className="mb-8">
+          <h2 className="text-lg font-semibold mb-4 text-gray-700 border-b border-gray-200 pb-2">Transaksi Dibatalkan</h2>
+          {canceledTransactions.length === 0 ? (
+            <p className="bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow-sm text-indigo-600">Tidak ada transaksi yang dibatalkan.</p>
+          ) : (
+            <ul className="space-y-6">
+              {canceledTransactions.map(tx => renderTransactionCard(tx, 'canceled'))}
+            </ul>
+          )}
+        </section>
+
+        {/* 5. Late Transactions (Terlambat Dikembalikan) */}
+        <section className="mb-8">
+          <h2 className="text-lg font-semibold mb-4 text-red-600 border-b border-red-200 pb-2">Terlambat Dikembalikan</h2>
+          {lateTransactions.length === 0 ? (
+            <p className="bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow-sm text-indigo-600">Tidak ada buku yang terlambat dikembalikan.</p>
+          ) : (
+            <ul className="space-y-6">
+              {lateTransactions.map(tx => renderTransactionCard(tx, 'late'))}
+            </ul>
+          )}
+        </section>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-white/80 backdrop-blur-sm py-4 border-t border-indigo-100 relative z-10 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm text-indigo-500">
+            &copy; 2025 AutoLib. All rights reserved.
+          </p>
+        </div>
+      </footer>
+
+      {/* Animation */}
+      <style jsx global>{`
+        @keyframes blob {
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -30px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
+    </div>
   );
 }
