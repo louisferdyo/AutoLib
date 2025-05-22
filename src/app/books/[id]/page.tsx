@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useBorrowStore } from '../../../stores/useBorrowState';
+import BookRating from '../../../component/BookRating';
 
 interface Book {
   id: string;
@@ -33,6 +34,8 @@ export default function BookDetailPage() {
   const [borrowing, setBorrowing] = useState(false);
   const [borrowError, setBorrowError] = useState<string | null>(null);
   const [borrowSuccess, setBorrowSuccess] = useState<boolean>(false);
+  const [userRating, setUserRating] = useState<number | null>(null);
+  const [canRate, setCanRate] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -47,6 +50,33 @@ export default function BookDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    async function checkRatingEligibility() {
+      if (!id) return;
+      
+      try {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session?.user) return;
+
+        // Check if user has borrowed and returned this book
+        const { data: transactions } = await supabase
+          .from('transactions')
+          .select('status')
+          .eq('book_id', id)
+          .eq('user_id', session.user.id)
+          .eq('status', 'finished')
+          .limit(1);
+
+        setCanRate(transactions && transactions.length > 0);
+      } catch (error) {
+        console.error('Error checking rating eligibility:', error);
+      }
+    }
+
+    checkRatingEligibility();
+  }, [id]);
   
   const handleBorrow = () => {
     if (!book) return;
@@ -106,6 +136,16 @@ export default function BookDetailPage() {
           <h1 className="text-3xl font-bold mb-2">{book.title}</h1>
           <h2 className="text-xl text-gray-600 mb-4">by {book.author}</h2>
 
+          {canRate && (
+            <div className="mb-6">
+              <h3 className="text-lg font-medium text-indigo-700 mb-2">Beri Penilaian</h3>
+              <BookRating 
+                bookId={book.id} 
+                onRatingSubmit={(rating) => setUserRating(rating)}
+              />
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2 mb-4">
             {book.categories?.map(cat => (
               <span
@@ -147,7 +187,7 @@ export default function BookDetailPage() {
             >
               {borrowing ? 'Memproses...' : 'Pinjam Buku'}
             </button>
-        </div>
+          </div>
 
         </div>
       </div>
