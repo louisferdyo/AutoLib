@@ -106,7 +106,7 @@ export default function ProfilePage() {
     }
   };
 
-  const updatePassword = async () => {
+  const updatePassword = async () => {  
     setPasswordError('');
 
     if (password !== confirmPassword) {
@@ -173,6 +173,12 @@ export default function ProfilePage() {
               className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300"
             >
               Lihat Aktivitas Pengguna
+            </button>
+            <button
+              onClick={() => router.push('/daftar-kartu')}
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300"
+            >
+              Lihat Daftar Kartu
             </button>
           </div>
 
