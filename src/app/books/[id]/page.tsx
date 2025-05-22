@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useBorrowStore } from '../../../stores/useBorrowState';
 import BookRating from '../../../component/BookRating';
+import { createClient } from '../../../lib/supabase';
 
 interface Book {
   id: string;
@@ -174,7 +175,6 @@ export default function BookDetailPage() {
             <p className="text-gray-700 whitespace-pre-line">{book.synopsis}</p>
           </div>
 
-          {/* Tombol Pinjam */}
           <div className="mt-6">
             <button
               onClick={handleBorrow}
