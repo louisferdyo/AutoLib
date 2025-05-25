@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '../../../lib/supabase';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface UserData {
   id: string;
@@ -45,7 +46,6 @@ export default function RegisterCardPage() {
         return;
       }
 
-      // Jika session valid, fetch user profile
       fetchUserProfile(session.user.id);
     };
 
@@ -56,9 +56,6 @@ export default function RegisterCardPage() {
     setLoading(true);
 
     try {
-      // 
-
-      // Ganti .single() dengan .maybeSingle() agar tidak error jika data kosong
       const { data, error } = await supabase
         .from('users')
         .select('id, full_name, email, card_id')
@@ -89,7 +86,6 @@ export default function RegisterCardPage() {
   };
 
   const handleRegisterCard = async () => {
-    console.log('User object before register:', user);
     if (!user) {
       setRegistrationStatus({ status: 'error', message: 'Data pengguna tidak tersedia' });
       return;
@@ -114,9 +110,7 @@ export default function RegisterCardPage() {
     });
 
     try {
-      // Ganti dengan IP ESP32 yang sebenarnya
-      const ESP32_IP = '192.168.84.238'; // Sesuaikan dengan IP ESP32 Anda
-      const response = await fetch(`http://${ESP32_IP}/registerCard`, {
+      const response = await fetch('https://c0c6-202-146-244-170.ngrok-free.app/registerCard', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +129,6 @@ export default function RegisterCardPage() {
         message: `Permintaan berhasil dikirim! ${data.message || 'Silakan tempatkan kartu pada pembaca'}`
       });
 
-      // Poll for registration completion
       pollRegistrationStatus();
 
     } catch (error) {
@@ -152,7 +145,6 @@ export default function RegisterCardPage() {
 
     const interval = setInterval(async () => {
       try {
-        // Refresh user data to check if card_id was updated
         const { data: userData, error } = await supabase
           .from('users')
           .select('id, full_name, email, card_id')
@@ -167,15 +159,13 @@ export default function RegisterCardPage() {
             user: userData
           });
           
-          // Update current user data
           setUser(userData);
         }
       } catch (error) {
         console.error('Error polling status:', error);
       }
-    }, 2000); // Poll every 2 seconds
+    }, 2000);
 
-    // Stop polling after 30 seconds (timeout)
     setTimeout(() => {
       clearInterval(interval);
       if (registrationStatus.status === 'waiting') {
@@ -199,34 +189,36 @@ export default function RegisterCardPage() {
     router.push('/login');
   };
 
-  // Show loading while checking authentication and fetching user data
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Memuat...</p>
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-purple-100 to-indigo-100 font-sans">
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+            <p className="mt-4 text-indigo-600">Memuat...</p>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Show error if user data not found
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md mx-auto text-center">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Pengguna Tidak Ditemukan</h1>
-            <p className="text-gray-600 mb-6">
-              Profil pengguna Anda tidak ditemukan dalam sistem. Silakan hubungi administrator.
-            </p>
-            <button
-              onClick={handleSignOut}
-              className="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 font-medium"
-            >
-              Keluar
-            </button>
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-purple-100 to-indigo-100 font-sans">
+        <div className="flex-grow flex items-center justify-center px-4">
+          <div className="max-w-md w-full">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-indigo-100">
+              <h1 className="text-2xl font-bold text-indigo-800 mb-4">Pengguna Tidak Ditemukan</h1>
+              <p className="text-indigo-600 mb-6">
+                Profil pengguna Anda tidak ditemukan dalam sistem. Silakan hubungi administrator.
+              </p>
+              <button
+                onClick={handleSignOut}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 px-4 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-medium"
+              >
+                Keluar
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -234,143 +226,201 @@ export default function RegisterCardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        {/* Header with user info and sign out */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Registrasi Kartu RFID</h1>
-              <p className="text-gray-600">Selamat datang, {user.full_name}</p>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-purple-100 to-indigo-100 font-sans">
+      {/* Header/Navigation */}
+      <nav className="bg-white/80 backdrop-blur-sm shadow-sm z-20 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex">
+              <div className="flex-shrink-0 flex items-center">
+                <Link href="/dashboard" className="text-xl font-bold text-purple-600 hover:text-purple-800 transition duration-300">
+                  <span className="text-indigo-600">Auto</span>Lib
+                </Link>
+              </div>
             </div>
-            <button
-              onClick={handleSignOut}
-              className="text-gray-500 hover:text-gray-700 font-medium"
-            >
-              Keluar
-            </button>
           </div>
         </div>
+      </nav>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          {/* User Info */}
-          <div className="bg-gray-50 p-4 rounded-md mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Informasi Anda</h2>
-            <div className="space-y-1">
-              <p className="text-sm text-gray-600">
-                <strong>Nama:</strong> {user.full_name}
-              </p>
-              <p className="text-sm text-gray-600">
-                <strong>Email:</strong> {user.email}
-              </p>
-              <p className="text-sm text-gray-600">
-                <strong>Status Kartu:</strong> 
-                {user.card_id ? (
-                  <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Terdaftar ({user.card_id})
-                  </span>
-                ) : (
-                  <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    Belum Terdaftar
-                  </span>
-                )}
-              </p>
+      {/* Decorative circles */}
+      <div className="absolute top-40 left-20 w-64 h-64 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+      <div className="absolute top-20 right-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-40 left-1/2 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+
+      {/* Main Content */}
+      <div className="flex-grow container mx-auto px-4 py-8 relative z-10">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-indigo-100 mb-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl font-bold text-indigo-800">Registrasi Kartu RFID</h1>
+                <p className="text-indigo-600">Selamat datang, {user.full_name}</p>
+              </div>
+              <button
+                onClick={handleSignOut}
+                className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-300"
+              >
+                Keluar
+              </button>
             </div>
           </div>
 
-          {registrationStatus.status === 'idle' && (
-            <div className="space-y-4">
-              {user.card_id ? (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-                  <p className="text-yellow-800">
-                    Anda sudah memiliki kartu RFID terdaftar. Jika perlu mengubahnya, silakan hubungi administrator.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <p className="text-gray-600 mb-4">
-                    Klik tombol di bawah untuk memulai proses registrasi kartu RFID. Anda akan diminta untuk menempatkan kartu pada pembaca.
-                  </p>
-                  <button
-                    onClick={handleRegisterCard}
-                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 font-medium"
-                  >
-                    Daftarkan Kartu RFID Saya
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-
-          {registrationStatus.status === 'loading' && (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">{registrationStatus.message}</p>
-            </div>
-          )}
-
-          {registrationStatus.status === 'waiting' && (
-            <div className="text-center py-8">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
-                <div className="flex items-center justify-center">
-                  <div className="animate-pulse h-4 w-4 bg-yellow-400 rounded-full mr-3"></div>
-                  <p className="text-yellow-800 font-medium">Menunggu kartu RFID...</p>
-                </div>
-                <p className="text-yellow-600 text-sm mt-2">
-                  Silakan tempatkan kartu RFID Anda pada pembaca sekarang.
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-indigo-100">
+            <div className="bg-indigo-50/50 backdrop-blur-sm p-4 rounded-xl mb-6">
+              <h2 className="text-lg font-semibold text-indigo-800 mb-2">Informasi Pengguna</h2>
+              <div className="space-y-2">
+                <p className="text-indigo-600">
+                  <span className="font-medium">Nama:</span> {user.full_name}
+                </p>
+                <p className="text-indigo-600">
+                  <span className="font-medium">Email:</span> {user.email}
+                </p>
+                <p className="text-indigo-600">
+                  <span className="font-medium">Status Kartu:</span> 
+                  {user.card_id ? (
+                    <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Terdaftar ({user.card_id})
+                    </span>
+                  ) : (
+                    <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      Belum Terdaftar
+                    </span>
+                  )}
                 </p>
               </div>
-              <p className="text-gray-600">{registrationStatus.message}</p>
             </div>
-          )}
 
-          {registrationStatus.status === 'success' && (
-            <div className="text-center py-8">
-              <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
-                <div className="flex items-center justify-center">
-                  <svg className="h-6 w-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <p className="text-green-800 font-medium">Registrasi Berhasil!</p>
-                </div>
+            {registrationStatus.status === 'idle' && (
+              <div className="space-y-4">
+                {user.card_id ? (
+                  <div className="bg-yellow-50/80 backdrop-blur-sm border border-yellow-200 rounded-xl p-4">
+                    <p className="text-yellow-800">
+                      Anda sudah memiliki kartu RFID terdaftar. Jika perlu mengubahnya, silakan hubungi administrator.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-indigo-600">
+                      Klik tombol di bawah untuk memulai proses registrasi kartu RFID. Anda akan diminta untuk menempatkan kartu pada pembaca.
+                    </p>
+                    <button
+                      onClick={handleRegisterCard}
+                      className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-4 rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium transition-all duration-300 transform hover:scale-105"
+                    >
+                      Daftarkan Kartu RFID
+                    </button>
+                  </>
+                )}
               </div>
-              <p className="text-gray-600 mb-4">{registrationStatus.message}</p>
-              {registrationStatus.user && (
-                <div className="bg-gray-50 p-4 rounded-md mb-4">
-                  <p className="text-sm text-gray-600">
-                    <strong>ID Kartu Anda:</strong> {registrationStatus.user.card_id}
+            )}
+
+            {registrationStatus.status === 'loading' && (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600 mx-auto"></div>
+                <p className="mt-4 text-indigo-600">{registrationStatus.message}</p>
+              </div>
+            )}
+
+            {registrationStatus.status === 'waiting' && (
+              <div className="text-center py-8">
+                <div className="bg-yellow-50/80 backdrop-blur-sm border border-yellow-200 rounded-xl p-6 mb-4">
+                  <div className="flex items-center justify-center">
+                    <div className="animate-pulse h-4 w-4 bg-yellow-400 rounded-full mr-3"></div>
+                    <p className="text-yellow-800 font-medium">Menunggu kartu RFID...</p>
+                  </div>
+                  <p className="text-yellow-700 text-sm mt-2">
+                    Silakan tempatkan kartu RFID Anda pada pembaca sekarang.
                   </p>
                 </div>
-              )}
-              <p className="text-green-600 font-medium">
-                Sekarang Anda dapat menggunakan kartu RFID untuk mengakses loker!
-              </p>
-            </div>
-          )}
-
-          {registrationStatus.status === 'error' && (
-            <div className="text-center py-8">
-              <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
-                <div className="flex items-center justify-center">
-                  <svg className="h-6 w-6 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  <p className="text-red-800 font-medium">Registrasi Gagal</p>
-                </div>
+                <p className="text-indigo-600">{registrationStatus.message}</p>
               </div>
-              <p className="text-gray-600 mb-4">{registrationStatus.message}</p>
-              {!user.card_id && (
-                <button
-                  onClick={resetRegistration}
-                  className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 font-medium"
-                >
-                  Coba Lagi
-                </button>
-              )}
-            </div>
-          )}
+            )}
+
+            {registrationStatus.status === 'success' && (
+              <div className="text-center py-8">
+                <div className="bg-green-50/80 backdrop-blur-sm border border-green-200 rounded-xl p-6 mb-4">
+                  <div className="flex items-center justify-center">
+                    <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                      <div className="h-6 w-6 text-green-600">✓</div>
+                    </div>
+                  </div>
+                  <p className="text-green-800 font-medium text-lg">Registrasi Berhasil!</p>
+                </div>
+                <p className="text-indigo-600 mb-4">{registrationStatus.message}</p>
+                {registrationStatus.user && (
+                  <div className="bg-indigo-50/50 backdrop-blur-sm p-4 rounded-xl mb-4">
+                    <p className="text-indigo-700">
+                      <span className="font-medium">ID Kartu Anda:</span> {registrationStatus.user.card_id}
+                    </p>
+                  </div>
+                )}
+                <p className="text-green-600 font-medium">
+                  Sekarang Anda dapat menggunakan kartu RFID untuk mengakses loker!
+                </p>
+              </div>
+            )}
+
+            {registrationStatus.status === 'error' && (
+              <div className="text-center py-8">
+                <div className="bg-red-50/80 backdrop-blur-sm border border-red-200 rounded-xl p-6 mb-4">
+                  <div className="flex items-center justify-center">
+                    <div className="h-12 w-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                      <div className="h-6 w-6 text-red-600">×</div>
+                    </div>
+                  </div>
+                  <p className="text-red-800 font-medium text-lg">Registrasi Gagal</p>
+                </div>
+                <p className="text-indigo-600 mb-6">{registrationStatus.message}</p>
+                {!user.card_id && (
+                  <button
+                    onClick={resetRegistration}
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 px-6 rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium transition-all duration-300 transform hover:scale-105"
+                  >
+                    Coba Lagi
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <Link href="/dashboard">
+              <button className="bg-white/80 backdrop-blur-sm text-indigo-600 py-2 px-6 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition-all duration-300 font-medium flex items-center">
+                <span className="mr-2">←</span>
+                Kembali ke Dashboard
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-white/80 backdrop-blur-sm py-4 border-t border-indigo-100 relative z-10 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm text-indigo-500">
+            &copy; 2025 AutoLib. All rights reserved.
+          </p>
+        </div>
+      </footer>
+
+      {/* Animation Styles */}
+      <style jsx global>{`
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(30px, -30px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
   );
 }
